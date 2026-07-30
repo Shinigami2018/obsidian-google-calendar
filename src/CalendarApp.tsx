@@ -80,7 +80,7 @@ export const CalendarApp = ({ plugin }: { plugin: GoogleCalendarPlugin }) => {
             account.refreshToken
         );
 
-        if (formEvent) {
+        if (formEvent && formEvent.id) {
             await api.updateEvent(calendarId, formEvent.id, data);
             new Notice('Event updated successfully');
         } else {

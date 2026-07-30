@@ -21796,7 +21796,7 @@ var CalendarApp = ({ plugin }) => {
       plugin.settings.clientSecret,
       account.refreshToken
     );
-    if (formEvent) {
+    if (formEvent && formEvent.id) {
       await api.updateEvent(calendarId, formEvent.id, data);
       new import_obsidian3.Notice("Event updated successfully");
     } else {
