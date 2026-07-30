@@ -54,6 +54,13 @@ export const CalendarApp = ({ plugin }: { plugin: GoogleCalendarPlugin }) => {
                     }
                 }
             }
+            
+            allCals.sort((a, b) => {
+                if (a.primary) return -1;
+                if (b.primary) return 1;
+                return 0;
+            });
+            
             setCalendars(allCals);
             setEvents(allEvents);
         } catch (err: any) {
@@ -81,13 +88,17 @@ export const CalendarApp = ({ plugin }: { plugin: GoogleCalendarPlugin }) => {
         );
 
         if (formEvent && formEvent.id) {
-            await api.updateEvent(calendarId, formEvent.id, data);
+            const updated = await api.updateEvent(calendarId, formEvent.id, data);
             new Notice('Event updated successfully');
+            setEvents(prev => prev.map(e => e.id === formEvent.id ? { ...updated, calendarColor: cal.backgroundColor, calendarId, accountId: account.id } : e));
         } else {
-            await api.createEvent(calendarId, data);
+            const created = await api.createEvent(calendarId, data);
             new Notice('Event created successfully');
+            setEvents(prev => [...prev, { ...created, calendarColor: cal.backgroundColor, calendarId, accountId: account.id }]);
         }
-        await fetchEvents();
+        
+        // Refresh from server in background to ensure consistency
+        setTimeout(() => fetchEvents(), 2000);
     };
 
     const handleDeleteEvent = async () => {
@@ -106,8 +117,11 @@ export const CalendarApp = ({ plugin }: { plugin: GoogleCalendarPlugin }) => {
         try {
             await api.deleteEvent(selectedEvent.calendarId, selectedEvent.id);
             new Notice('Event deleted');
+            setEvents(prev => prev.filter(e => e.id !== selectedEvent.id));
             setSelectedEvent(null);
-            await fetchEvents();
+            
+            // Refresh from server in background
+            setTimeout(() => fetchEvents(), 2000);
         } catch (err: any) {
             new Notice('Failed to delete: ' + err.message);
         }
@@ -138,7 +152,8 @@ export const CalendarApp = ({ plugin }: { plugin: GoogleCalendarPlugin }) => {
                     events={events} 
                     onEventClick={e => setSelectedEvent(e)}
                     onDayClick={(date) => {
-                        setFormEvent({ start: { date: date.toISOString().slice(0,10) }, end: { date: date.toISOString().slice(0,10) } });
+                        const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                        setFormEvent({ start: { date: dateString }, end: { date: dateString } });
                         setShowForm(true);
                     }}
                 />

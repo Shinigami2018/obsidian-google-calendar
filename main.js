@@ -21466,7 +21466,7 @@ __export(main_exports, {
   default: () => GoogleCalendarPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian6 = require("obsidian");
+var import_obsidian7 = require("obsidian");
 
 // src/settings.ts
 var import_obsidian = require("obsidian");
@@ -21522,7 +21522,7 @@ var GoogleCalendarSettingTab = class extends import_obsidian.PluginSettingTab {
 };
 
 // src/DashboardView.tsx
-var import_obsidian4 = require("obsidian");
+var import_obsidian5 = require("obsidian");
 var React5 = __toESM(require_react());
 var import_client = __toESM(require_client());
 
@@ -21648,17 +21648,34 @@ var MonthView = ({ currentMonth, events, onEventClick, onDayClick }) => {
     const isToday = day.getTime() === today.getTime();
     const dayStart = new Date(day);
     dayStart.setHours(0, 0, 0, 0);
-    const dayEnd = new Date(day);
-    dayEnd.setHours(23, 59, 59, 999);
+    const nextDay = new Date(day);
+    nextDay.setDate(nextDay.getDate() + 1);
+    nextDay.setHours(0, 0, 0, 0);
     const dayEvents = events.filter((e) => {
-      const eStart = new Date(e.start.dateTime || e.start.date);
-      let eEnd = new Date(e.end.dateTime || e.end.date);
-      if (!e.end.dateTime) {
-        eEnd = new Date(eEnd.getTime() - 1);
+      let eStart, eEnd;
+      if (e.start.dateTime) {
+        eStart = new Date(e.start.dateTime);
+        eEnd = new Date(e.end.dateTime);
+      } else {
+        const [sYear, sMonth, sDay] = e.start.date.split("-").map(Number);
+        eStart = new Date(sYear, sMonth - 1, sDay);
+        const [eYear, eMonth, eDay] = e.end.date.split("-").map(Number);
+        eEnd = new Date(eYear, eMonth - 1, eDay);
       }
-      return eStart <= dayEnd && eEnd >= dayStart;
+      const overlaps = eStart < nextDay && eEnd > dayStart;
+      const isZeroDuration = eStart.getTime() === eEnd.getTime();
+      const fallsOnDay = eStart >= dayStart && eStart < nextDay;
+      return overlaps || isZeroDuration && fallsOnDay;
     });
-    dayEvents.sort((a, b) => new Date(a.start.dateTime || a.start.date).getTime() - new Date(b.start.dateTime || b.start.date).getTime());
+    dayEvents.sort((a, b) => {
+      const isAllDayA = !a.start.dateTime;
+      const isAllDayB = !b.start.dateTime;
+      if (isAllDayA && !isAllDayB) return -1;
+      if (!isAllDayA && isAllDayB) return 1;
+      const timeA = new Date(a.start.dateTime || a.start.date).getTime();
+      const timeB = new Date(b.start.dateTime || b.start.date).getTime();
+      return timeA - timeB;
+    });
     return /* @__PURE__ */ React.createElement("div", { key: i, className: `gcal-month-cell ${isCurrentMonth ? "" : "gcal-other-month"} ${isToday ? "gcal-today" : ""}`, onClick: () => onDayClick(day) }, /* @__PURE__ */ React.createElement("div", { className: "gcal-month-cell-header" }, /* @__PURE__ */ React.createElement("span", { className: "gcal-day-number" }, day.getDate())), /* @__PURE__ */ React.createElement("div", { className: "gcal-month-cell-events" }, dayEvents.map((e, index) => {
       const isAllDay = !e.start.dateTime;
       return /* @__PURE__ */ React.createElement("div", { key: `${e.id}-${index}`, className: `gcal-event-pill ${isAllDay ? "gcal-all-day" : ""}`, style: { backgroundColor: e.calendarColor || "var(--interactive-accent)" }, onClick: (ev) => {
@@ -21684,6 +21701,7 @@ var EventModal = ({ event, onClose, onEdit, onDelete }) => {
 // src/EventFormModal.tsx
 var React3 = __toESM(require_react());
 var import_react = __toESM(require_react());
+var import_obsidian3 = require("obsidian");
 var EventFormModal = ({ event, calendars, onClose, onSave }) => {
   const [title, setTitle] = (0, import_react.useState)((event == null ? void 0 : event.summary) || "");
   const [calendarId, setCalendarId] = (0, import_react.useState)((event == null ? void 0 : event.calendarId) || (calendars.length > 0 ? calendars[0].id : ""));
@@ -21720,19 +21738,18 @@ var EventFormModal = ({ event, calendars, onClose, onSave }) => {
       end: endObj
     };
     try {
-      await onSave(data, calendarId);
       onClose();
+      await onSave(data, calendarId);
     } catch (err) {
       console.error(err);
-      alert("Failed to save event");
-      setIsSaving(false);
+      new import_obsidian3.Notice("Failed to save event");
     }
   };
   return /* @__PURE__ */ React3.createElement("div", { className: "gcal-modal-overlay", onClick: onClose }, /* @__PURE__ */ React3.createElement("div", { className: "gcal-modal-content gcal-form-modal", onClick: (e) => e.stopPropagation() }, /* @__PURE__ */ React3.createElement("button", { className: "gcal-modal-close", onClick: onClose }, "\xD7"), /* @__PURE__ */ React3.createElement("h2", null, event ? "Edit Event" : "New Event"), /* @__PURE__ */ React3.createElement("form", { onSubmit: handleSubmit }, /* @__PURE__ */ React3.createElement("div", { className: "gcal-form-group" }, /* @__PURE__ */ React3.createElement("label", null, "Title"), /* @__PURE__ */ React3.createElement("input", { type: "text", required: true, value: title, onChange: (e) => setTitle(e.target.value), placeholder: "Add title" })), /* @__PURE__ */ React3.createElement("div", { className: "gcal-form-group" }, /* @__PURE__ */ React3.createElement("label", null, "Calendar"), /* @__PURE__ */ React3.createElement("select", { value: calendarId, onChange: (e) => setCalendarId(e.target.value) }, calendars.map((cal) => /* @__PURE__ */ React3.createElement("option", { key: cal.id, value: cal.id }, cal.summary)))), /* @__PURE__ */ React3.createElement("div", { className: "gcal-form-group gcal-checkbox" }, /* @__PURE__ */ React3.createElement("label", null, /* @__PURE__ */ React3.createElement("input", { type: "checkbox", checked: isAllDay, onChange: (e) => setIsAllDay(e.target.checked) }), "All Day")), /* @__PURE__ */ React3.createElement("div", { className: "gcal-form-group gcal-row" }, /* @__PURE__ */ React3.createElement("div", { className: "gcal-col" }, /* @__PURE__ */ React3.createElement("label", null, "Start Date"), /* @__PURE__ */ React3.createElement("input", { type: "date", required: true, value: startDate, onChange: (e) => setStartDate(e.target.value) })), !isAllDay && /* @__PURE__ */ React3.createElement("div", { className: "gcal-col" }, /* @__PURE__ */ React3.createElement("label", null, "Start Time"), /* @__PURE__ */ React3.createElement("input", { type: "time", required: true, value: startTime, onChange: (e) => setStartTime(e.target.value) }))), /* @__PURE__ */ React3.createElement("div", { className: "gcal-form-group gcal-row" }, /* @__PURE__ */ React3.createElement("div", { className: "gcal-col" }, /* @__PURE__ */ React3.createElement("label", null, "End Date"), /* @__PURE__ */ React3.createElement("input", { type: "date", required: true, value: endDate, onChange: (e) => setEndDate(e.target.value) })), !isAllDay && /* @__PURE__ */ React3.createElement("div", { className: "gcal-col" }, /* @__PURE__ */ React3.createElement("label", null, "End Time"), /* @__PURE__ */ React3.createElement("input", { type: "time", required: true, value: endTime, onChange: (e) => setEndTime(e.target.value) }))), /* @__PURE__ */ React3.createElement("div", { className: "gcal-modal-actions" }, /* @__PURE__ */ React3.createElement("button", { type: "button", className: "gcal-btn-edit", onClick: onClose }, "Cancel"), /* @__PURE__ */ React3.createElement("button", { type: "submit", className: "gcal-btn-save", disabled: isSaving }, isSaving ? "Saving..." : "Save")))));
 };
 
 // src/CalendarApp.tsx
-var import_obsidian3 = require("obsidian");
+var import_obsidian4 = require("obsidian");
 var CalendarApp = ({ plugin }) => {
   const [events, setEvents] = (0, import_react2.useState)([]);
   const [calendars, setCalendars] = (0, import_react2.useState)([]);
@@ -21775,6 +21792,11 @@ var CalendarApp = ({ plugin }) => {
           }
         }
       }
+      allCals.sort((a, b) => {
+        if (a.primary) return -1;
+        if (b.primary) return 1;
+        return 0;
+      });
       setCalendars(allCals);
       setEvents(allEvents);
     } catch (err) {
@@ -21797,13 +21819,15 @@ var CalendarApp = ({ plugin }) => {
       account.refreshToken
     );
     if (formEvent && formEvent.id) {
-      await api.updateEvent(calendarId, formEvent.id, data);
-      new import_obsidian3.Notice("Event updated successfully");
+      const updated = await api.updateEvent(calendarId, formEvent.id, data);
+      new import_obsidian4.Notice("Event updated successfully");
+      setEvents((prev) => prev.map((e) => e.id === formEvent.id ? { ...updated, calendarColor: cal.backgroundColor, calendarId, accountId: account.id } : e));
     } else {
-      await api.createEvent(calendarId, data);
-      new import_obsidian3.Notice("Event created successfully");
+      const created = await api.createEvent(calendarId, data);
+      new import_obsidian4.Notice("Event created successfully");
+      setEvents((prev) => [...prev, { ...created, calendarColor: cal.backgroundColor, calendarId, accountId: account.id }]);
     }
-    await fetchEvents();
+    setTimeout(() => fetchEvents(), 2e3);
   };
   const handleDeleteEvent = async () => {
     if (!selectedEvent) return;
@@ -21817,11 +21841,12 @@ var CalendarApp = ({ plugin }) => {
     );
     try {
       await api.deleteEvent(selectedEvent.calendarId, selectedEvent.id);
-      new import_obsidian3.Notice("Event deleted");
+      new import_obsidian4.Notice("Event deleted");
+      setEvents((prev) => prev.filter((e) => e.id !== selectedEvent.id));
       setSelectedEvent(null);
-      await fetchEvents();
+      setTimeout(() => fetchEvents(), 2e3);
     } catch (err) {
-      new import_obsidian3.Notice("Failed to delete: " + err.message);
+      new import_obsidian4.Notice("Failed to delete: " + err.message);
     }
   };
   const changeMonth = (offset) => {
@@ -21839,7 +21864,8 @@ var CalendarApp = ({ plugin }) => {
       events,
       onEventClick: (e) => setSelectedEvent(e),
       onDayClick: (date) => {
-        setFormEvent({ start: { date: date.toISOString().slice(0, 10) }, end: { date: date.toISOString().slice(0, 10) } });
+        const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+        setFormEvent({ start: { date: dateString }, end: { date: dateString } });
         setShowForm(true);
       }
     }
@@ -21868,7 +21894,7 @@ var CalendarApp = ({ plugin }) => {
 
 // src/DashboardView.tsx
 var VIEW_TYPE_CALENDAR = "google-calendar-dashboard";
-var DashboardView = class extends import_obsidian4.ItemView {
+var DashboardView = class extends import_obsidian5.ItemView {
   constructor(leaf, plugin) {
     super(leaf);
     this.root = null;
@@ -21896,7 +21922,7 @@ var DashboardView = class extends import_obsidian4.ItemView {
 
 // src/auth.ts
 var http = __toESM(require("http"));
-var import_obsidian5 = require("obsidian");
+var import_obsidian6 = require("obsidian");
 var REDIRECT_URI = "http://127.0.0.1:3000/callback";
 var SCOPE = "https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/userinfo.email";
 async function authenticateAccount(clientId, clientSecret) {
@@ -21907,7 +21933,7 @@ async function authenticateAccount(clientId, clientSecret) {
         if (url.pathname === "/callback") {
           const code = url.searchParams.get("code");
           if (!code) throw new Error("No authorization code found");
-          const tokenResponse = await (0, import_obsidian5.requestUrl)({
+          const tokenResponse = await (0, import_obsidian6.requestUrl)({
             url: "https://oauth2.googleapis.com/token",
             method: "POST",
             contentType: "application/x-www-form-urlencoded",
@@ -21923,7 +21949,7 @@ async function authenticateAccount(clientId, clientSecret) {
             throw new Error(`Failed to exchange token: ${tokenResponse.text}`);
           }
           const tokens = tokenResponse.json;
-          const userInfoResponse = await (0, import_obsidian5.requestUrl)({
+          const userInfoResponse = await (0, import_obsidian6.requestUrl)({
             url: "https://www.googleapis.com/oauth2/v1/userinfo?alt=json",
             headers: {
               Authorization: `Bearer ${tokens.access_token}`
@@ -21961,7 +21987,7 @@ async function authenticateAccount(clientId, clientSecret) {
 }
 
 // src/main.ts
-var GoogleCalendarPlugin = class extends import_obsidian6.Plugin {
+var GoogleCalendarPlugin = class extends import_obsidian7.Plugin {
   async onload() {
     await this.loadSettings();
     this.registerView(

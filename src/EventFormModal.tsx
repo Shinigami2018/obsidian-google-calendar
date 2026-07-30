@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
+import { Notice } from 'obsidian';
 
 export const EventFormModal = ({ event, calendars, onClose, onSave }: { event?: any, calendars: any[], onClose: () => void, onSave: (data: any, calendarId: string) => Promise<void> }) => {
     const [title, setTitle] = useState(event?.summary || '');
@@ -48,12 +49,11 @@ export const EventFormModal = ({ event, calendars, onClose, onSave }: { event?: 
         };
 
         try {
+            onClose(); // Close modal instantly
             await onSave(data, calendarId);
-            onClose();
         } catch (err) {
             console.error(err);
-            alert('Failed to save event');
-            setIsSaving(false);
+            new Notice('Failed to save event');
         }
     };
 

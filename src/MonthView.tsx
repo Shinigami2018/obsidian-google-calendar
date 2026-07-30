@@ -39,20 +39,40 @@ export const MonthView = ({ currentMonth, events, onEventClick, onDayClick }: { 
                     
                     const dayStart = new Date(day);
                     dayStart.setHours(0,0,0,0);
-                    const dayEnd = new Date(day);
-                    dayEnd.setHours(23,59,59,999);
+                    const nextDay = new Date(day);
+                    nextDay.setDate(nextDay.getDate() + 1);
+                    nextDay.setHours(0,0,0,0);
 
                     const dayEvents = events.filter(e => {
-                        const eStart = new Date(e.start.dateTime || e.start.date);
-                        let eEnd = new Date(e.end.dateTime || e.end.date);
-                        // For all-day events, the end date is exclusive, so subtract 1 ms to prevent overlapping into the next day unnecessarily
-                        if (!e.end.dateTime) {
-                            eEnd = new Date(eEnd.getTime() - 1);
+                        let eStart, eEnd;
+                        if (e.start.dateTime) {
+                            eStart = new Date(e.start.dateTime);
+                            eEnd = new Date(e.end.dateTime);
+                        } else {
+                            const [sYear, sMonth, sDay] = e.start.date.split('-').map(Number);
+                            eStart = new Date(sYear, sMonth - 1, sDay);
+                            
+                            const [eYear, eMonth, eDay] = e.end.date.split('-').map(Number);
+                            eEnd = new Date(eYear, eMonth - 1, eDay);
                         }
-                        return eStart <= dayEnd && eEnd >= dayStart;
+                        
+                        const overlaps = eStart < nextDay && eEnd > dayStart;
+                        const isZeroDuration = eStart.getTime() === eEnd.getTime();
+                        const fallsOnDay = eStart >= dayStart && eStart < nextDay;
+
+                        return overlaps || (isZeroDuration && fallsOnDay);
                     });
 
-                    dayEvents.sort((a, b) => new Date(a.start.dateTime || a.start.date).getTime() - new Date(b.start.dateTime || b.start.date).getTime());
+                    dayEvents.sort((a, b) => {
+                        const isAllDayA = !a.start.dateTime;
+                        const isAllDayB = !b.start.dateTime;
+                        if (isAllDayA && !isAllDayB) return -1;
+                        if (!isAllDayA && isAllDayB) return 1;
+                        
+                        const timeA = new Date(a.start.dateTime || a.start.date).getTime();
+                        const timeB = new Date(b.start.dateTime || b.start.date).getTime();
+                        return timeA - timeB;
+                    });
 
                     return (
                         <div key={i} className={`gcal-month-cell ${isCurrentMonth ? '' : 'gcal-other-month'} ${isToday ? 'gcal-today' : ''}`} onClick={() => onDayClick(day)}>
