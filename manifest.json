@@ -1,0 +1,10 @@
+{
+	"id": "obsidian-google-calendar",
+	"name": "Google Calendar Dashboard",
+	"version": "1.0.0",
+	"minAppVersion": "1.0.0",
+	"description": "A minimalistic Google Calendar dashboard allowing multi-account support.",
+	"author": "Antigravity",
+	"authorUrl": "",
+	"isDesktopOnly": true
+}

@@ -1,0 +1,286 @@
+.gcal-dashboard-wrapper {
+    padding: 20px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.gcal-app h1, .gcal-app h2 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.gcal-app h2 {
+    font-size: 1.4em;
+}
+
+.gcal-loading, .gcal-error, .gcal-no-events {
+    color: var(--text-muted);
+    font-size: 1.1em;
+    text-align: center;
+    margin-top: 40px;
+}
+
+.gcal-error {
+    color: var(--text-error);
+}
+
+.gcal-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.gcal-toolbar-right {
+    display: flex;
+    gap: 10px;
+}
+
+.gcal-content.gcal-is-loading {
+    opacity: 0.6;
+}
+
+.gcal-month-grid {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border-top: 1px solid var(--background-modifier-border);
+    border-left: 1px solid var(--background-modifier-border);
+}
+
+.gcal-month-header-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background-color: var(--background-secondary);
+}
+
+.gcal-month-header-cell {
+    padding: 8px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.9em;
+    color: var(--text-muted);
+    border-right: 1px solid var(--background-modifier-border);
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.gcal-month-body {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-auto-rows: minmax(100px, 1fr);
+    flex-grow: 1;
+}
+
+.gcal-month-cell {
+    border-right: 1px solid var(--background-modifier-border);
+    border-bottom: 1px solid var(--background-modifier-border);
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--background-primary);
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.gcal-month-cell:hover {
+    background-color: var(--background-secondary-alt);
+}
+
+.gcal-month-cell.gcal-other-month {
+    background-color: var(--background-secondary);
+    opacity: 0.6;
+}
+
+.gcal-month-cell.gcal-today .gcal-day-number {
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gcal-month-cell-header {
+    text-align: right;
+    font-size: 0.85em;
+    margin-bottom: 4px;
+    padding: 2px;
+}
+
+.gcal-month-cell-events {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+}
+
+.gcal-month-cell-events::-webkit-scrollbar {
+    display: none;
+}
+.gcal-month-cell-events {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.gcal-event-pill {
+    font-size: 0.75em;
+    padding: 2px 4px;
+    border-radius: 4px;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    gap: 4px;
+}
+
+.gcal-event-pill.gcal-all-day {
+    font-weight: 500;
+}
+
+.gcal-event-pill-time {
+    opacity: 0.8;
+}
+
+.gcal-event-pill-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Modals */
+.gcal-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.gcal-modal-content {
+    background-color: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 8px;
+    padding: 24px;
+    min-width: 300px;
+    max-width: 500px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.gcal-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.gcal-modal-content h2 {
+    margin-top: 0;
+}
+
+.gcal-modal-time, .gcal-modal-location {
+    margin-bottom: 12px;
+    color: var(--text-normal);
+}
+
+.gcal-modal-description {
+    background-color: var(--background-secondary);
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.gcal-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.gcal-btn-primary, .gcal-btn-save {
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.gcal-btn-edit {
+    background-color: var(--background-modifier-border);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.gcal-btn-delete {
+    background-color: var(--text-error);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Forms */
+.gcal-form-modal {
+    width: 400px;
+}
+
+.gcal-form-group {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.gcal-form-group.gcal-row {
+    flex-direction: row;
+    gap: 16px;
+}
+
+.gcal-form-group .gcal-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.gcal-form-group label {
+    font-size: 0.9em;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.gcal-form-group input[type="text"], 
+.gcal-form-group input[type="date"], 
+.gcal-form-group input[type="time"],
+.gcal-form-group select {
+    background-color: var(--background-modifier-form-field);
+    border: 1px solid var(--background-modifier-border);
+    padding: 8px;
+    border-radius: 4px;
+    color: var(--text-normal);
+}
+
+.gcal-form-group.gcal-checkbox {
+    flex-direction: row;
+    align-items: center;
+}
+
+.gcal-form-group.gcal-checkbox input {
+    margin-right: 8px;
+}
