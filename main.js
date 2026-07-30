@@ -21769,28 +21769,39 @@ var CalendarApp = ({ plugin }) => {
       const month = currentMonth.getMonth();
       const timeMin = new Date(year, month - 1, 20).toISOString();
       const timeMax = new Date(year, month + 1, 10).toISOString();
-      for (const account of plugin.settings.accounts) {
+      const accountPromises = plugin.settings.accounts.map(async (account) => {
         const api = new GoogleCalendarAPI(
           plugin.settings.clientId,
           plugin.settings.clientSecret,
           account.refreshToken
         );
         const cals = await api.getCalendars();
+        const accountCals = [];
+        const eventPromises = [];
         for (const cal of cals) {
           if (cal.accessRole === "writer" || cal.accessRole === "owner") {
-            allCals.push({ ...cal, accountId: account.id, accountEmail: account.email });
+            accountCals.push({ ...cal, accountId: account.id, accountEmail: account.email });
           }
           if (cal.selected) {
-            const calEvents = await api.getEvents(cal.id, timeMin, timeMax);
-            const coloredEvents = calEvents.map((e) => ({
-              ...e,
-              calendarColor: cal.backgroundColor,
-              calendarId: cal.id,
-              accountId: account.id
-            }));
-            allEvents = allEvents.concat(coloredEvents);
+            const eventPromise = api.getEvents(cal.id, timeMin, timeMax).then((calEvents) => {
+              return calEvents.map((e) => ({
+                ...e,
+                calendarColor: cal.backgroundColor,
+                calendarId: cal.id,
+                accountId: account.id
+              }));
+            });
+            eventPromises.push(eventPromise);
           }
         }
+        const resolvedEvents = await Promise.all(eventPromises);
+        const accountEvents = resolvedEvents.flat();
+        return { accountCals, accountEvents };
+      });
+      const results = await Promise.all(accountPromises);
+      for (const res of results) {
+        allCals = allCals.concat(res.accountCals);
+        allEvents = allEvents.concat(res.accountEvents);
       }
       allCals.sort((a, b) => {
         if (a.primary) return -1;
