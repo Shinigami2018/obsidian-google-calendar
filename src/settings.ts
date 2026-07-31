@@ -33,6 +33,25 @@ export class GoogleCalendarSettingTab extends PluginSettingTab {
 
         containerEl.createEl('h2', {text: 'Google Calendar Dashboard Settings'});
 
+        const instructions = containerEl.createEl('div');
+        instructions.style.marginBottom = '20px';
+        instructions.style.padding = '10px 15px';
+        instructions.style.backgroundColor = 'var(--background-secondary)';
+        instructions.style.borderRadius = '4px';
+        
+        instructions.createEl('span', {text: 'Need help finding your Client ID and Secret? '});
+        const readmeLink = instructions.createEl('a', {
+            text: 'Read the setup guide on GitHub',
+            href: 'https://github.com/Shinigami2018/obsidian-google-calendar'
+        });
+        readmeLink.setAttr('target', '_blank');
+
+        const starP = instructions.createEl('p');
+        starP.style.marginTop = '10px';
+        starP.style.color = 'var(--text-muted)';
+        starP.style.fontSize = '0.9em';
+        starP.innerText = '⭐ If you find this plugin helpful, it would greatly help me if you starred the project on GitHub!';
+
         new Setting(containerEl)
             .setName('Google Cloud Client ID')
             .setDesc('Your OAuth 2.0 Client ID for desktop applications.')

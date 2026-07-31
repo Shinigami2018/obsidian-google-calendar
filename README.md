@@ -43,7 +43,7 @@ To pull your calendar data, you need to create an OAuth2 app in Google Cloud.
    - **User support email**: (Your email)
    - **Developer contact info**: (Your email)
 4. Click **Save and Continue**.
-5. On the **Scopes** page, you don't need to add anything manually here, just click **Save and Continue**.
+5. On the **Scopes** page, click **Add or Remove Scopes**. Search for "Google Calendar API" and **enable all scopes** related to the Google Calendar API. Click Update, then click **Save and Continue**.
 6. **CRITICAL STEP (Test Users)**: While your app is in the "Testing" phase, Google requires you to explicitly whitelist emails that are allowed to log in. Under **Test users**, click **+ Add Users** and type in the Google email address(es) you plan to link to the plugin. If you don't do this, you will get an `Access Denied (403)` error when trying to log in!
 7. Click **Save and Continue**.
 
