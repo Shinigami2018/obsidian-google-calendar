@@ -1,6 +1,18 @@
 import * as React from 'react';
 
-export const MonthView = ({ currentMonth, events, onEventClick, onDayClick }: { currentMonth: Date, events: any[], onEventClick: (event: any) => void, onDayClick: (date: Date) => void }) => {
+const getContrastColor = (hexcolor: string) => {
+    if (!hexcolor) return '#ffffff';
+    let hex = hexcolor.replace('#', '');
+    if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    if (hex.length !== 6) return '#ffffff';
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return yiq >= 128 ? '#000000' : '#ffffff';
+};
+
+export const MonthView = ({ currentMonth, events, onEventClick, onDayClick }: {  currentMonth: Date, events: any[], onEventClick: (event: any) => void, onDayClick: (date: Date) => void }) => {
     const getDaysInMonth = () => {
         const year = currentMonth.getFullYear();
         const month = currentMonth.getMonth();
@@ -83,7 +95,7 @@ export const MonthView = ({ currentMonth, events, onEventClick, onDayClick }: { 
                                 {dayEvents.map((e, index) => {
                                     const isAllDay = !e.start.dateTime;
                                     return (
-                                        <div key={`${e.id}-${index}`} className={`gcal-event-pill ${isAllDay ? 'gcal-all-day' : ''}`} style={{ backgroundColor: e.calendarColor || 'var(--interactive-accent)' }} onClick={(ev) => { ev.stopPropagation(); onEventClick(e); }}>
+                                        <div key={`${e.id}-${index}`} className={`gcal-event-pill ${isAllDay ? 'gcal-all-day' : ''}`} style={{ backgroundColor: e.calendarColor || 'var(--interactive-accent)', color: getContrastColor(e.calendarColor || '') }} onClick={(ev) => { ev.stopPropagation(); onEventClick(e); }}>
                                             {!isAllDay && <span className="gcal-event-pill-time">{new Date(e.start.dateTime).toLocaleTimeString([], {hour: 'numeric', minute:'2-digit'})}</span>}
                                             <span className="gcal-event-pill-title">{e.summary || '(No Title)'}</span>
                                         </div>

@@ -190,6 +190,8 @@
 
 .gcal-modal-content h2 {
     margin-top: 0;
+    padding-right: 40px;
+    word-break: break-word;
 }
 
 .gcal-modal-time, .gcal-modal-location {

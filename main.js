@@ -21621,6 +21621,17 @@ var GoogleCalendarAPI = class {
 
 // src/MonthView.tsx
 var React = __toESM(require_react());
+var getContrastColor = (hexcolor) => {
+  if (!hexcolor) return "#ffffff";
+  let hex = hexcolor.replace("#", "");
+  if (hex.length === 3) hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+  if (hex.length !== 6) return "#ffffff";
+  const r = parseInt(hex.slice(0, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
+  const b = parseInt(hex.slice(4, 6), 16);
+  const yiq = (r * 299 + g * 587 + b * 114) / 1e3;
+  return yiq >= 128 ? "#000000" : "#ffffff";
+};
 var MonthView = ({ currentMonth, events, onEventClick, onDayClick }) => {
   const getDaysInMonth = () => {
     const year = currentMonth.getFullYear();
@@ -21678,7 +21689,7 @@ var MonthView = ({ currentMonth, events, onEventClick, onDayClick }) => {
     });
     return /* @__PURE__ */ React.createElement("div", { key: i, className: `gcal-month-cell ${isCurrentMonth ? "" : "gcal-other-month"} ${isToday ? "gcal-today" : ""}`, onClick: () => onDayClick(day) }, /* @__PURE__ */ React.createElement("div", { className: "gcal-month-cell-header" }, /* @__PURE__ */ React.createElement("span", { className: "gcal-day-number" }, day.getDate())), /* @__PURE__ */ React.createElement("div", { className: "gcal-month-cell-events" }, dayEvents.map((e, index) => {
       const isAllDay = !e.start.dateTime;
-      return /* @__PURE__ */ React.createElement("div", { key: `${e.id}-${index}`, className: `gcal-event-pill ${isAllDay ? "gcal-all-day" : ""}`, style: { backgroundColor: e.calendarColor || "var(--interactive-accent)" }, onClick: (ev) => {
+      return /* @__PURE__ */ React.createElement("div", { key: `${e.id}-${index}`, className: `gcal-event-pill ${isAllDay ? "gcal-all-day" : ""}`, style: { backgroundColor: e.calendarColor || "var(--interactive-accent)", color: getContrastColor(e.calendarColor || "") }, onClick: (ev) => {
         ev.stopPropagation();
         onEventClick(e);
       } }, !isAllDay && /* @__PURE__ */ React.createElement("span", { className: "gcal-event-pill-time" }, new Date(e.start.dateTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })), /* @__PURE__ */ React.createElement("span", { className: "gcal-event-pill-title" }, e.summary || "(No Title)"));
@@ -21787,6 +21798,7 @@ var CalendarApp = ({ plugin }) => {
               return calEvents.map((e) => ({
                 ...e,
                 calendarColor: cal.backgroundColor,
+                calendarForegroundColor: cal.foregroundColor,
                 calendarId: cal.id,
                 accountId: account.id
               }));

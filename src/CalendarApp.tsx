@@ -50,6 +50,7 @@ export const CalendarApp = ({ plugin }: { plugin: GoogleCalendarPlugin }) => {
                             return calEvents.map((e: any) => ({
                                 ...e,
                                 calendarColor: cal.backgroundColor,
+                                calendarForegroundColor: cal.foregroundColor,
                                 calendarId: cal.id,
                                 accountId: account.id
                             }));
