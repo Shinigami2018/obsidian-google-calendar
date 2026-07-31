@@ -21877,7 +21877,16 @@ var CalendarApp = ({ plugin }) => {
     next.setMonth(next.getMonth() + offset);
     setCurrentMonth(next);
   };
-  return /* @__PURE__ */ React4.createElement("div", { className: "gcal-app" }, /* @__PURE__ */ React4.createElement("div", { className: "gcal-toolbar" }, /* @__PURE__ */ React4.createElement("button", { onClick: () => changeMonth(-1) }, "\u2190 Prev"), /* @__PURE__ */ React4.createElement("h2", null, currentMonth.toLocaleDateString([], { month: "long", year: "numeric" })), /* @__PURE__ */ React4.createElement("div", { className: "gcal-toolbar-right" }, /* @__PURE__ */ React4.createElement("button", { onClick: () => changeMonth(1) }, "Next \u2192"), /* @__PURE__ */ React4.createElement("button", { className: "gcal-btn-primary", onClick: () => {
+  return /* @__PURE__ */ React4.createElement("div", { className: "gcal-app" }, /* @__PURE__ */ React4.createElement("div", { className: "gcal-toolbar" }, /* @__PURE__ */ React4.createElement("button", { onClick: () => changeMonth(-1) }, "\u2190 Prev"), /* @__PURE__ */ React4.createElement("h2", null, currentMonth.toLocaleDateString([], { month: "long", year: "numeric" })), /* @__PURE__ */ React4.createElement("div", { className: "gcal-toolbar-right" }, /* @__PURE__ */ React4.createElement("button", { onClick: () => changeMonth(1) }, "Next \u2192"), /* @__PURE__ */ React4.createElement(
+    "button",
+    {
+      className: "gcal-btn-edit",
+      onClick: () => fetchEvents(),
+      disabled: loading,
+      style: { opacity: loading ? 0.7 : 1 }
+    },
+    loading ? "\u21BB Syncing..." : "\u21BB Refresh"
+  ), /* @__PURE__ */ React4.createElement("button", { className: "gcal-btn-primary", onClick: () => {
     setFormEvent(null);
     setShowForm(true);
   } }, "+ Add Event"))), error && /* @__PURE__ */ React4.createElement("div", { className: "gcal-error" }, "Error: ", error), /* @__PURE__ */ React4.createElement("div", { className: `gcal-content ${loading ? "gcal-is-loading" : ""}` }, /* @__PURE__ */ React4.createElement(

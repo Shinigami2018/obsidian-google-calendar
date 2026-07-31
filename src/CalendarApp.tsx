@@ -155,6 +155,14 @@ export const CalendarApp = ({ plugin }: { plugin: GoogleCalendarPlugin }) => {
                 <h2>{currentMonth.toLocaleDateString([], { month: 'long', year: 'numeric' })}</h2>
                 <div className="gcal-toolbar-right">
                     <button onClick={() => changeMonth(1)}>Next →</button>
+                    <button 
+                        className="gcal-btn-edit" 
+                        onClick={() => fetchEvents()} 
+                        disabled={loading}
+                        style={{ opacity: loading ? 0.7 : 1 }}
+                    >
+                        {loading ? '↻ Syncing...' : '↻ Refresh'}
+                    </button>
                     <button className="gcal-btn-primary" onClick={() => { setFormEvent(null); setShowForm(true); }}>+ Add Event</button>
                 </div>
             </div>
